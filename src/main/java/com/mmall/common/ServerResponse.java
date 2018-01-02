@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  * 1.泛型
- * 2.实现虚拟化接口
+ * 2.实现序列化接口
  * @param <T>
  */
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -73,15 +73,15 @@ public class ServerResponse<T> implements Serializable {
     }
 
     public static <T> ServerResponse<T> createByError(){
-        return new ServerResponse<T>(ResponseCode.EEEOR.getCode(), ResponseCode.EEEOR.getDesc());
+        return new ServerResponse<T>(ResponseCode.ERROR.getCode(), ResponseCode.ERROR.getDesc());
     }
 
     public static <T> ServerResponse<T> createByErrorMessage(String errorMessage){
-        return new ServerResponse<T>(ResponseCode.EEEOR.getCode(), errorMessage);
+        return new ServerResponse<T>(ResponseCode.ERROR.getCode(), errorMessage);
     }
 
-    public static <T> ServerResponse<T> createByErrorMessage(int erroeCode, String errorMessage){
-        return new ServerResponse<T>(erroeCode, errorMessage);
+    public static <T> ServerResponse<T> createByErrorMessage(int errorCode, String errorMessage){
+        return new ServerResponse<T>(errorCode, errorMessage);
     }
 
 }

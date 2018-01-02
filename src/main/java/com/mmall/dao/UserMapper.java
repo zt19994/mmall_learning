@@ -16,7 +16,21 @@ public interface UserMapper {
 
     int updateByPrimaryKey(User record);
 
+    /**
+     * 通过用户名查询用户是否存在
+     * @param username
+     * @return
+     */
     int checkUsername(String username);
 
+    /**
+     * 通过id查询用户是否存在
+     * @param email
+     * @return
+     */
+    int checkEmail(String email);
+
     User selectLogin(@Param("username") String username, @Param("password") String password);
+
+
 }

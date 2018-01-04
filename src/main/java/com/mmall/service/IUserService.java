@@ -27,4 +27,20 @@ public interface IUserService {
      * @return
      */
     ServerResponse<String> checkValid(String str, String type);
+
+    /**
+     * 查询用户密码提示问题
+     * @param username
+     * @return
+     */
+    ServerResponse selectQuestion(String username);
+
+    /**
+     * 校验密码提示问题是否正确
+     * @param username
+     * @param question
+     * @param answer
+     * @return
+     */
+    ServerResponse<String> checkAnswer(String username, String question, String answer);
 }

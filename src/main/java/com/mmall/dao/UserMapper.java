@@ -46,5 +46,13 @@ public interface UserMapper {
      * @param answer
      * @return
      */
-    int checkAnswer(@Param("username")String username,@Param("question") String question,@Param("answer") String answer);
+    int checkAnswer(@Param("username") String username,@Param("question") String question,@Param("answer") String answer);
+
+    /**
+     * 通过用户名重置密码
+     * @param username
+     * @param passwordNew 新密码是MD5加密后的密码
+     * @return
+     */
+    int updatePasswordByUsername(@Param("username") String username,@Param("passwordNew") String passwordNew);
 }

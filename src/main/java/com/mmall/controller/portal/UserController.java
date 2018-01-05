@@ -4,6 +4,7 @@ import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import javafx.scene.chart.ValueAxis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -93,8 +94,7 @@ public class UserController {
     @RequestMapping(value = "forgetGetQuestion.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<String> forgetGetQuestion(String username){
-        ServerResponse selectQuestion = userService.selectQuestion(username);
-        return selectQuestion;
+        return userService.selectQuestion(username);
     }
 
     /**
@@ -104,10 +104,15 @@ public class UserController {
      * @param answer
      * @return
      */
-    @RequestMapping(value = "forgetCheckAnswer", method = RequestMethod.GET)
+    @RequestMapping(value = "forgetCheckAnswer.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse<String> forgetCheckAnswer(String username, String question, String answer){
-        ServerResponse<String> checkAnswer = userService.checkAnswer(username, question, answer);
-        return checkAnswer;
+        return userService.checkAnswer(username, question, answer);
+    }
+
+    @RequestMapping(value = "forgetResetPassword.do", method = RequestMethod.GET)
+    @ResponseBody
+    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken){
+        return userService.forgetResetPassword(username, passwordNew, forgetToken);
     }
 }

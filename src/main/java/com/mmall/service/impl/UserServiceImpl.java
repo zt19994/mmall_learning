@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Connection;
 import java.util.UUID;
 
+import static com.mmall.common.TokenCache.TOKEN_PREFIX;
+
 @Service("iUserService")
 public class UserServiceImpl implements IUserService {
     @Autowired
@@ -97,7 +99,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     public ServerResponse selectQuestion(String username){
-        //1.首先查看用户名是否存在，所有可以复用checkValid方法
+        //1.首先查看用户名是否存在，所以可以复用checkValid方法
         ServerResponse<String> validResponse = this.checkValid(username, Const.USERNAME);
         if (validResponse.isSuccess()){
             //用户不存在，取非的问题
@@ -116,10 +118,39 @@ public class UserServiceImpl implements IUserService {
         if (resultCount>0){
             //创建token，并放入缓存
             String forgetToken = UUID.randomUUID().toString();
-            TokenCache.setKey("token_" + username, forgetToken);
+            TokenCache.setKey(TOKEN_PREFIX + username, forgetToken);
             return ServerResponse.createBySuccess(forgetToken);
         }
         return ServerResponse.createByErrorMessage("问题答案错误");
+    }
+
+    @Override
+    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+        //1.校验参数
+        if(StringUtils.isBlank(forgetToken)){
+            return ServerResponse.createByErrorMessage("参数错误，forgetToken不存在");
+        }
+        ServerResponse<String> checkValidUsername = this.checkValid(username, Const.USERNAME);
+        if (checkValidUsername.isSuccess()){
+            //用户不存在，取非的问题
+            return ServerResponse.createByErrorMessage("用户不存在");
+        }
+        String token = TokenCache.getKey(TOKEN_PREFIX + username);
+        //校验token
+        if(StringUtils.isBlank(token)){
+            return ServerResponse.createByErrorMessage("token无效或过期");
+        }
+        if (StringUtils.equals(forgetToken,token)){
+            String md5Password = MD5Util.MD5EncodeUtf8(passwordNew);
+            int resultCount = userMapper.updatePasswordByUsername(username, md5Password);
+
+            if (resultCount>0){
+                return ServerResponse.createBySuccessMessage("修改密码成功");
+            }
+        }else {
+            return ServerResponse.createByErrorMessage("token错误，请重新获取重置密码的token");
+        }
+        return ServerResponse.createByErrorMessage("修改密码失败");
     }
 
 

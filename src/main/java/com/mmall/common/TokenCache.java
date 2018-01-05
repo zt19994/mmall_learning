@@ -8,10 +8,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 本地缓存
+ * 1.用与检查密码提示问题是否正确
+ */
 public class TokenCache {
 
     //1.日志
     private static Logger logger = LoggerFactory.getLogger(TokenCache.class);
+
+    //忘记密码的token前缀
+    public static final String TOKEN_PREFIX = "token_";
 
     //2.声明静态的内存块,LRU算法
     private static LoadingCache<String, String> localCache = CacheBuilder.newBuilder().initialCapacity(1000).maximumSize(10000)

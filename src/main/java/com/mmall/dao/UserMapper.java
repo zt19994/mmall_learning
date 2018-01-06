@@ -55,4 +55,20 @@ public interface UserMapper {
      * @return
      */
     int updatePasswordByUsername(@Param("username") String username,@Param("passwordNew") String passwordNew);
+
+    /**
+     * 校验旧密码是否正确
+     * @param password
+     * @param userId
+     * @return
+     */
+    int checkPassword(@Param("password")String password,@Param("userId") Integer userId);
+
+    /**
+     * 校验邮箱是否已经被其他用户所使用
+     * @param email
+     * @param userId
+     * @return
+     */
+    int checkEmailByUserId(@Param("email")String email,@Param("userId") Integer userId);
 }

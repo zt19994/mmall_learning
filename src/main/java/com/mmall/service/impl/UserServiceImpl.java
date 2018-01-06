@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
 import java.util.UUID;
 
 import static com.mmall.common.TokenCache.TOKEN_PREFIX;
@@ -151,6 +150,53 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("token错误，请重新获取重置密码的token");
         }
         return ServerResponse.createByErrorMessage("修改密码失败");
+    }
+
+    @Override
+    public ServerResponse<String> resetPassword(String passwordOld, String passwordNew, User user) {
+        //防止横向越权，所有需要校验用户的旧密码和该用户，查询count(1)
+        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
+        if (resultCount==0){
+            return ServerResponse.createByErrorMessage("旧密码错误");
+        }
+        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+        int updateCount = userMapper.updateByPrimaryKeySelective(user);
+        if (updateCount >0){
+            return ServerResponse.createBySuccessMessage("密码更新成功");
+        }
+        return ServerResponse.createByErrorMessage("密码更新失败");
+    }
+
+    @Override
+    public ServerResponse<User> updateUserInfo(User user) {
+        //username不能被更新
+        //校验email是否已经存在
+        int retultCount = userMapper.checkEmailByUserId(user.getAnswer(), user.getId());
+        if (retultCount>0){
+            return ServerResponse.createByErrorMessage("email已经存在，请更换email");
+        }
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setEmail(user.getEmail());
+        updateUser.setPhone(user.getPhone());
+        updateUser.setQuestion(user.getQuestion());
+        updateUser.setAnswer(user.getAnswer());
+        int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
+        if (updateCount>0){
+            return ServerResponse.createBySuccess("更新个人信息成功", updateUser);
+        }
+        return ServerResponse.createByErrorMessage("更新用户信息失败");
+    }
+
+    @Override
+    public ServerResponse<User> getUserInfo(Integer userId) {
+        User user = userMapper.selectByPrimaryKey(userId);
+        if (user==null){
+            return ServerResponse.createByErrorMessage("找不到当前用户");
+        }
+        //把用户密码设为空
+        user.setPassword(StringUtils.EMPTY);
+        return ServerResponse.createBySuccess(user);
     }
 
 

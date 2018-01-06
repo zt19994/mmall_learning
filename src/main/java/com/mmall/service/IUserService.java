@@ -52,4 +52,27 @@ public interface IUserService {
      * @return
      */
     ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken);
+
+    /**
+     * 在用户登录状态下修改密码
+     * @param passwordOld
+     * @param passwordNew
+     * @param user
+     * @return
+     */
+    ServerResponse<String> resetPassword(String passwordOld, String passwordNew, User user);
+
+    /**
+     * 更新用户信息
+     * @param user
+     * @return
+     */
+    ServerResponse<User> updateUserInfo(User user);
+
+    /**
+     * 获取用户详细信息
+     * @param userId
+     * @return
+     */
+    ServerResponse<User> getUserInfo(Integer userId);
 }

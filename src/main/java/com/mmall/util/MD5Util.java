@@ -5,9 +5,8 @@ import java.security.MessageDigest;
 public class MD5Util {
 
     private static String byteArrayToHexString(byte b[]) {
-        StringBuffer resultSb = new StringBuffer();
-        for (int i = 0; i < b.length; i++)
-            resultSb.append(byteToHexString(b[i]));
+        StringBuilder resultSb = new StringBuilder();
+        for (byte aB : b) resultSb.append(byteToHexString(aB));
 
         return resultSb.toString();
     }
@@ -25,25 +24,22 @@ public class MD5Util {
      * 返回大写MD5
      *
      * @param origin
-     * @param charsetname
      * @return
      */
-    private static String MD5Encode(String origin, String charsetname) {
+    private static String MD5Encode(String origin) {
         String resultString = null;
         try {
-            resultString = new String(origin);
+            resultString = origin;
             MessageDigest md = MessageDigest.getInstance("MD5");
-            if (charsetname == null || "".equals(charsetname))
-                resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
-            else
-                resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
-        } catch (Exception exception) {
+            resultString = byteArrayToHexString(md.digest(resultString.getBytes("utf-8")));
+        } catch (Exception ignored) {
         }
-        return resultString.toUpperCase();
+        return resultString != null ? resultString.toUpperCase() : null;
     }
 
     public static String MD5EncodeUtf8(String origin) {
-        return MD5Encode(origin, "utf-8");
+        origin = origin + PropertiesUtil.getProperty("password.salt", "");
+        return MD5Encode(origin);
     }
 
 

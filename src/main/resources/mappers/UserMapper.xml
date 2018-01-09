@@ -187,7 +187,7 @@
   </select>
 
   <select id="checkEmailByUserId" resultType="int" parameterType="map">
-    SELECT COUNT(1) FROM mmall_user WHERE email=#{email} and id !=#{userId};
+    SELECT COUNT(1) FROM mmall_user WHERE email=#{email} and id !=#{userId}
   </select>
 
 </mapper>

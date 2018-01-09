@@ -88,7 +88,7 @@ public class UserServiceImpl implements IUserService {
                 //2.检查邮箱是否存在
                 int resultCount = userMapper.checkEmail(str);
                 if (resultCount > 0) {
-                    return ServerResponse.createByErrorMessage("Email已存在");
+                    return ServerResponse.createByErrorMessage("email已存在");
                 }
             }
         }else {
@@ -97,9 +97,10 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createBySuccessMessage("校验成功");
     }
 
+
     public ServerResponse selectQuestion(String username){
         //1.首先查看用户名是否存在，所以可以复用checkValid方法
-        ServerResponse<String> validResponse = this.checkValid(username, Const.USERNAME);
+        ServerResponse validResponse = this.checkValid(username, Const.USERNAME);
         if (validResponse.isSuccess()){
             //用户不存在，取非的问题
             return ServerResponse.createByErrorMessage("用户不存在");
@@ -171,8 +172,8 @@ public class UserServiceImpl implements IUserService {
     public ServerResponse<User> updateUserInfo(User user) {
         //username不能被更新
         //校验email是否已经存在
-        int retultCount = userMapper.checkEmailByUserId(user.getAnswer(), user.getId());
-        if (retultCount>0){
+        int resultCount = userMapper.checkEmailByUserId(user.getEmail(), user.getId());
+        if (resultCount>0){
             return ServerResponse.createByErrorMessage("email已经存在，请更换email");
         }
         User updateUser = new User();
@@ -199,5 +200,17 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createBySuccess(user);
     }
 
+    //后端
 
+    /**
+     * 校验是否是管理员
+     * @param user
+     * @return
+     */
+    public ServerResponse checkAdminRole(User user){
+        if (user!=null && user.getRole().intValue()== Const.Role.ROLE_ADMIN){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+    }
 }

@@ -1,5 +1,6 @@
 package com.mmall.dao;
 
+import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import org.apache.ibatis.annotations.Param;
 
@@ -46,7 +47,7 @@ public interface UserMapper {
      * @param answer
      * @return
      */
-    int checkAnswer(@Param("username") String username,@Param("question") String question,@Param("answer") String answer);
+    int checkAnswer(@Param("username")String username,@Param("question")String question,@Param("answer")String answer);
 
     /**
      * 通过用户名重置密码
@@ -54,7 +55,7 @@ public interface UserMapper {
      * @param passwordNew 新密码是MD5加密后的密码
      * @return
      */
-    int updatePasswordByUsername(@Param("username") String username,@Param("passwordNew") String passwordNew);
+    int updatePasswordByUsername(@Param("username")String username,@Param("passwordNew")String passwordNew);
 
     /**
      * 校验旧密码是否正确
@@ -62,7 +63,7 @@ public interface UserMapper {
      * @param userId
      * @return
      */
-    int checkPassword(@Param("password")String password,@Param("userId") Integer userId);
+    int checkPassword(@Param("password")String password,@Param("userId")Integer userId);
 
     /**
      * 校验邮箱是否已经被其他用户所使用
@@ -70,5 +71,7 @@ public interface UserMapper {
      * @param userId
      * @return
      */
-    int checkEmailByUserId(@Param("email")String email,@Param("userId") Integer userId);
+    int checkEmailByUserId(@Param("email")String email,@Param("userId")Integer userId);
+
+
 }

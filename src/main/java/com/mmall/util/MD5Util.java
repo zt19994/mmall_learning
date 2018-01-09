@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 public class MD5Util {
 
     private static String byteArrayToHexString(byte b[]) {
-        StringBuilder resultSb = new StringBuilder();
+        StringBuffer resultSb = new StringBuffer();
         for (byte aB : b) resultSb.append(byteToHexString(aB));
 
         return resultSb.toString();
@@ -22,24 +22,27 @@ public class MD5Util {
 
     /**
      * 返回大写MD5
-     *
      * @param origin
+     * @param charsetname
      * @return
      */
-    private static String MD5Encode(String origin) {
+    private static String MD5Encode(String origin, String charsetname) {
         String resultString = null;
         try {
-            resultString = origin;
+            resultString = new String(origin);
             MessageDigest md = MessageDigest.getInstance("MD5");
-            resultString = byteArrayToHexString(md.digest(resultString.getBytes("utf-8")));
-        } catch (Exception ignored) {
+            if (charsetname == null || "".equals(charsetname))
+                resultString = byteArrayToHexString(md.digest(resultString.getBytes()));
+            else
+                resultString = byteArrayToHexString(md.digest(resultString.getBytes(charsetname)));
+        } catch (Exception exception) {
         }
-        return resultString != null ? resultString.toUpperCase() : null;
+        return resultString.toUpperCase();
     }
 
     public static String MD5EncodeUtf8(String origin) {
         origin = origin + PropertiesUtil.getProperty("password.salt", "");
-        return MD5Encode(origin);
+        return MD5Encode(origin, "utf-8");
     }
 
 

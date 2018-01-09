@@ -5,7 +5,6 @@ import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
-import javafx.scene.chart.ValueAxis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -163,6 +162,7 @@ public class UserController {
         ServerResponse<User> response = userService.updateUserInfo(user);
         if (response.isSuccess()){
             //如果更新用户信息成功，则重新保存用户的session
+            response.getData().setUsername(currentUser.getUsername());
             httpSession.setAttribute(Const.CURRENT_USER, response.getData());
         }
         return response;

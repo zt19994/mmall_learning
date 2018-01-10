@@ -1,6 +1,9 @@
 package com.mmall.service;
 
 import com.mmall.common.ServerResponse;
+import com.mmall.pojo.Category;
+
+import java.util.List;
 
 public interface ICategoryService {
     /**
@@ -18,4 +21,18 @@ public interface ICategoryService {
      * @return
      */
     ServerResponse updateCategoryName(Integer categoryId, String categoryName);
+
+    /**
+     * 获取子节点平级的商品信息
+     * @param categoryId
+     * @return
+     */
+    ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId);
+
+    /**
+     * 递归查询本节点id和子节点id
+     * @param categoryId
+     * @return
+     */
+    ServerResponse selectCategoryAndChildrenById(Integer categoryId);
 }

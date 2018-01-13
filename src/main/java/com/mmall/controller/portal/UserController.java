@@ -6,11 +6,14 @@ import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -18,6 +21,29 @@ import javax.servlet.http.HttpSession;
 public class UserController {
     @Autowired
     private IUserService userService;
+
+
+    /**
+     * 跳转到登录页面
+     * @return
+     */
+    @RequestMapping("toLogin.do")
+    public ModelAndView toLogin(){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("/WEB-INF/view/login.jsp");
+        return modelAndView;
+    }
+
+    /**
+     * 跳转到注册页面
+     * @return
+     */
+    @RequestMapping("toRegister.do")
+    public ModelAndView toRegister(){
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("/WEB-INF/view/register.jsp");
+        return modelAndView;
+    }
 
     /**
      * 用户登录

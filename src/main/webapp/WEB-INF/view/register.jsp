@@ -58,10 +58,19 @@
                 <button onclick="register()">注册</button>
             </td>
         </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <button onclick="toLogin()">已有账号,去登录</button>
+            </td>
+        </tr>
     </table>
 </div>
 </body>
 <script type="text/javascript">
+    function toLogin() {
+        window.location.href="http://localhost:8080/user/toLogin.do";
+    }
+
     function register() {
         var username = $("#username").val();
         var password = $("#password").val();
@@ -89,7 +98,6 @@
                 var msg = data.msg;
                 alert(status);
                 alert(msg);
-                alert("成功啦");
             },
             error: function (data) {
                 alert("失败啦");

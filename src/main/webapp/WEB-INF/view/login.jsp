@@ -20,24 +20,39 @@
         <tr>
             <td>用户名:</td>
             <td>
-                <input id="username"  type="text" value="">
+                <input id="username"  type="text" placeholder="请输入用户名" value="">
             </td>
         </tr>
         <tr>
             <td>密 码:</td>
             <td>
-                <input id="password"  type="password" value="">
+                <input id="password"  type="password" placeholder="请输入密码" value="">
             </td>
         </tr>
         <tr>
             <td colspan="2" align="center">
                 <button onclick="login()">登录</button>
             </td>
+
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <button onclick="forgetPassword()">忘记密码</button>
+                <button onclick="toRegister()">免费注册</button>
+            </td>
         </tr>
     </table>
 </div>
 </body>
 <script>
+    function forgetPassword() {
+        window.location.href="http://localhost:8080/user/toForgetPage.do";
+    }
+
+    function toRegister() {
+        window.location.href="http://localhost:8080/user/toRegister.do";
+    }
+
     function login() {
         var username = $("#username").val();
         var password = $("#password").val();
@@ -55,12 +70,14 @@
             success: function (data) {
                 var status = data.status;
                 var msg = data.msg;
-                alert(status);
-                alert(msg);
-                alert("成功啦");
+                if (status===0){
+                    alert(msg);
+                } else if (status===1){
+                    alert(msg);
+                }
             },
             error: function (data) {
-                alert("失败啦");
+                alert("失败");
             }
         });
     }

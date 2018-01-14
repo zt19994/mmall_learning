@@ -1,5 +1,8 @@
 package com.mmall.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
@@ -10,9 +13,12 @@ import com.mmall.service.IProductService;
 import com.mmall.util.DateTimeUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.ProductDetailVo;
+import com.mmall.vo.ProductListVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service("iProductService")
 public class ProductServiceImpl implements IProductService {
@@ -86,6 +92,7 @@ public class ProductServiceImpl implements IProductService {
         return ServerResponse.createBySuccess(productDetailVo);
     }
 
+
     //封装productDetailVo对象
     private ProductDetailVo assembleProductDetailVo(Product product){
         ProductDetailVo productDetailVo = new ProductDetailVo();
@@ -104,7 +111,7 @@ public class ProductServiceImpl implements IProductService {
 
         Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
         if (category==null){
-            //把父类categotyId设为0,默认为根节点
+            //把父类categoryId设为0,默认为根节点
             productDetailVo.setParentCategoryId(0);
         }else {
             productDetailVo.setParentCategoryId(category.getParentId());
@@ -113,5 +120,39 @@ public class ProductServiceImpl implements IProductService {
         productDetailVo.setCreateTime(DateTimeUtil.dateToStr(product.getCreateTime()));
         productDetailVo.setUpdateTime(DateTimeUtil.dateToStr(product.getUpdateTime()));
         return productDetailVo;
+    }
+
+
+    @Override
+    public ServerResponse<PageInfo> getProductList(int pageNum, int pageSize) {
+        //pageHelper的使用方法，三步
+        //1.startPage,记录一个开始
+        PageHelper.startPage(pageNum, pageSize);
+        //2.填充自己的sql查询逻辑
+        List<ProductListVo> productListVos = Lists.newArrayList();
+        List<Product> products = productMapper.selectList();
+        for (Product product : products) {
+            ProductListVo productListVo = assembleProductListVo(product);
+            productListVos.add(productListVo);
+        }
+        //3.pageHelper的收尾
+        PageInfo pageResult = new PageInfo(products);
+        pageResult.setList(productListVos);
+        return ServerResponse.createBySuccess(pageResult);
+
+    }
+
+    //封装ProductListVo对象
+    private ProductListVo assembleProductListVo(Product product){
+        ProductListVo productListVo = new ProductListVo();
+        productListVo.setId(product.getId());
+        productListVo.setCategoryId(product.getCategoryId());
+        productListVo.setName(product.getName());
+        productListVo.setSubtitle(product.getSubtitle());
+        productListVo.setMainImage(product.getMainImage());
+        productListVo.setPrice(product.getPrice());
+        productListVo.setStatus(product.getStatus());
+        productListVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://img.happymmall.com/"));
+        return productListVo;
     }
 }

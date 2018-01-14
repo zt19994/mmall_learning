@@ -10,6 +10,7 @@ import com.mmall.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
@@ -93,5 +94,28 @@ public class ProductManageController {
         }else {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
+    }
+
+    /**
+     * 查询后台产品列表信息
+     * @param session
+     * @param pageNum 当前页
+     * @param pageSize 每页条数
+     * @return
+     */
+    @RequestMapping("list.do")
+    @ResponseBody
+    public ServerResponse getList(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") int pageNum, @RequestParam(value = "pageSize", defaultValue = "10") int pageSize){
+        //检查是否登录
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录管理员账号");
+        }
+        //检查是否有管理员权限
+        if (userService.checkAdminRole(user).isSuccess()){
+            //业务逻辑
+            return productService.getProductList(pageNum, pageSize);
+        }
+        return ServerResponse.createByErrorMessage("无权限操作");
     }
 }

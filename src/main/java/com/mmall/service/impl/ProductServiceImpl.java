@@ -155,4 +155,25 @@ public class ProductServiceImpl implements IProductService {
         productListVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://img.happymmall.com/"));
         return productListVo;
     }
+
+    @Override
+    public ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize) {
+        //pageHelper的使用方法，三步
+        //1.startPage,记录一个开始
+        PageHelper.startPage(pageNum, pageSize);
+        if (StringUtils.isNotBlank(productName)){
+            productName = new StringBuilder().append("%").append(productName).append("%").toString();
+        }
+        //2.填充自己的sql查询逻辑
+        List<Product> productList = productMapper.selectByNameAndProductId(productName, productId);
+        //把product转换为ProductListVo
+        List<ProductListVo> productListVoList = Lists.newArrayList();
+        for (Product product : productList) {
+            ProductListVo productListVo = assembleProductListVo(product);
+            productListVoList.add(productListVo);
+        }//3.pageHelper的收尾
+        PageInfo pageResult = new PageInfo(productList);
+        pageResult.setList(productListVoList);
+        return ServerResponse.createBySuccess(pageResult);
+    }
 }

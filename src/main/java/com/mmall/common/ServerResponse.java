@@ -14,6 +14,7 @@ import java.io.Serializable;
 //保证如果序列化是null的对象，就会消失
 public class ServerResponse<T> implements Serializable {
 
+    //状态
     private int status;
     private String msg;
     private T data;

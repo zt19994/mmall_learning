@@ -58,15 +58,15 @@ public class UserController {
      * 用户登录
      * @param username
      * @param password
-     * @param httpSession
+     * @param session
      * @return
      */
     @RequestMapping(value="login.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> login(String username, String password, HttpSession httpSession){
+    public ServerResponse<User> login(String username, String password, HttpSession session){
         ServerResponse<User> response = userService.login(username, password);
          if (response.isSuccess()){
-             httpSession.setAttribute(Const.CURRENT_USER, response.getData());
+             session.setAttribute(Const.CURRENT_USER, response.getData());
          }
         return response;
     }

@@ -1,6 +1,8 @@
 package com.mmall.service.impl;
 
+import com.google.common.collect.Lists;
 import com.mmall.service.IFileService;
+import com.mmall.util.FTPUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,10 +36,11 @@ public class FileServiceImpl implements IFileService{
             file.transferTo(targetFile);
             //到这里，文件已经上传成功了
 
-            //todo 将targetFile上传到FTP服务器
+            FTPUtil.uploadFile(Lists.newArrayList(targetFile));
+            //已经上传到服务器上
 
             //todo 上传完毕之后，删除upload中的文件，因为文件在Tomcat中，会越来越大
-
+            targetFile.delete();
         } catch (IOException e) {
             logger.error("上传文件异常", e);
             return targetFile.getName();

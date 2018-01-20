@@ -5,12 +5,14 @@ import com.mmall.service.IFileService;
 import com.mmall.util.FTPUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 
+@Service("iFileService")
 public class FileServiceImpl implements IFileService{
     private Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
@@ -39,7 +41,6 @@ public class FileServiceImpl implements IFileService{
             FTPUtil.uploadFile(Lists.newArrayList(targetFile));
             //已经上传到服务器上
 
-            //todo 上传完毕之后，删除upload中的文件，因为文件在Tomcat中，会越来越大
             targetFile.delete();
         } catch (IOException e) {
             logger.error("上传文件异常", e);

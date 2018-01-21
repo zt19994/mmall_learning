@@ -10,6 +10,7 @@ import com.mmall.dao.CategoryMapper;
 import com.mmall.dao.ProductMapper;
 import com.mmall.pojo.Category;
 import com.mmall.pojo.Product;
+import com.mmall.service.ICategoryService;
 import com.mmall.service.IProductService;
 import com.mmall.util.DateTimeUtil;
 import com.mmall.util.PropertiesUtil;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service("iProductService")
@@ -28,6 +30,9 @@ public class ProductServiceImpl implements IProductService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private ICategoryService categoryService;
 
     @Override
     public ServerResponse saveOrUpdateProduct(Product product) {
@@ -172,7 +177,8 @@ public class ProductServiceImpl implements IProductService {
         for (Product product : productList) {
             ProductListVo productListVo = assembleProductListVo(product);
             productListVoList.add(productListVo);
-        }//3.pageHelper的收尾
+        }
+        //3.pageHelper的收尾
         PageInfo pageResult = new PageInfo(productList);
         pageResult.setList(productListVoList);
         return ServerResponse.createBySuccess(pageResult);
@@ -194,6 +200,44 @@ public class ProductServiceImpl implements IProductService {
         }
         ProductDetailVo productDetailVo = assembleProductDetailVo(product);
         return ServerResponse.createBySuccess(productDetailVo);
+    }
+
+    @Override
+    public ServerResponse<PageInfo> getProductByKeywordCategoryId(String keyword, Integer categoryId, int pageNum, int pageSize, String orderBy) {
+        //判断keyword和categoryId是否为空
+        if (StringUtils.isBlank(keyword) && categoryId==null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        List<Integer> categoryIdList = new ArrayList<Integer>();
+
+        if (categoryId!=null){
+            //获取category
+            Category category = categoryMapper.selectByPrimaryKey(categoryId);
+            if (category==null && StringUtils.isBlank(keyword)){
+                //没有该分类和关键字，返回空字符集，不报错
+                //pageHelper的使用方法，三步
+                //1.startPage,记录一个开始
+                PageHelper.startPage(pageNum, pageSize);
+                //2.填充自己的sql查询逻辑
+                List<ProductListVo> productListVoList = Lists.newArrayList();
+                //3.pageHelper的收尾
+                PageInfo pageInfo = new PageInfo(productListVoList);
+                return ServerResponse.createBySuccess(pageInfo);
+            }
+            //递归获取分类id
+            categoryIdList = categoryService.selectCategoryAndChildrenById(category.getId()).getData();
+        }
+        if (StringUtils.isNotBlank(keyword)){
+            keyword = new StringBuilder().append("%").append("%").append("%").toString();
+        }
+        PageHelper.startPage(pageNum, pageSize);
+        //排序处理
+        if (StringUtils.isNotBlank(orderBy)){
+            if(Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)){
+
+            }
+        }
+        return null;
     }
 
 

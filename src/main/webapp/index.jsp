@@ -12,6 +12,19 @@
     <button onclick="toLogin()">登录页面</button>
     <button onclick="toRegister()">注册页面</button>
 </div>
+<div align="center">
+    springmvc上传文件
+    <form name="form1" action="/manage/product/upload.do" method="post" enctype="multipart/form-data">
+        <input type="file" name="upload_file" />
+        <input type="submit" value="springmvc上传文件" />
+    </form>
+
+    富文本图片上传文件
+    <form name="form2" action="/manage/product/richtext_img_upload.do" method="post" enctype="multipart/form-data">
+        <input type="file" name="upload_file" />
+        <input type="submit" value="富文本图片上传文件" />
+    </form>
+</div>
 </body>
 <script type="text/javascript">
     function toLogin() {

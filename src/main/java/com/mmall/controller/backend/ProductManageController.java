@@ -10,6 +10,7 @@ import com.mmall.service.IFileService;
 import com.mmall.service.IProductService;
 import com.mmall.service.IUserService;
 import com.mmall.util.PropertiesUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -161,14 +163,63 @@ public class ProductManageController {
      */
     @RequestMapping("upload.do")
     @ResponseBody
-    public ServerResponse upload(MultipartFile file, HttpServletRequest request){
-        String path = request.getSession().getServletContext().getRealPath("upload");
-        String targetFileName = fileService.upload(file, path);
-        String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
+    public ServerResponse upload(HttpSession session,@RequestParam(value="upload_file",required = false) MultipartFile file, HttpServletRequest request){
+        //检查是否登录
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录管理员账号");
+        }//检查是否有管理员权限
+        if (userService.checkAdminRole(user).isSuccess()){
+            //业务逻辑
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            String targetFileName = fileService.upload(file, path);
+            String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
 
-        Map fileMap = Maps.newHashMap();
-        fileMap.put("uri", targetFileName);
-        fileMap.put("url", url);
-        return ServerResponse.createBySuccess(fileMap);
+            Map fileMap = Maps.newHashMap();
+            fileMap.put("uri", targetFileName);
+            fileMap.put("url", url);
+            return ServerResponse.createBySuccess(fileMap);
+        }
+        return ServerResponse.createByErrorMessage("无权限操作");
+    }
+
+    @RequestMapping("richtext_img_upload.do")
+    @ResponseBody
+    public Map richtextImgUpload(HttpSession session, @RequestParam(value="upload_file",required = false)
+            MultipartFile file, HttpServletRequest request, HttpServletResponse response){
+        Map resultMap = Maps.newHashMap();
+        //检查是否登录
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null){
+            resultMap.put("success", false);
+            resultMap.put("msg", "用户未登录，请登录管理员账号");
+            return resultMap;
+        }//检查是否有管理员权限
+        //simditor的要求进行返回
+        /*{
+          "success": true/false,
+          "msg": "error message", # optional
+          "file_path": "[real file path]"
+           }*/
+        if (userService.checkAdminRole(user).isSuccess()){
+            //业务逻辑
+            String path = request.getSession().getServletContext().getRealPath("upload");
+            String targetFileName = fileService.upload(file, path);
+            if (StringUtils.isBlank(targetFileName)){
+                resultMap.put("success", false);
+                resultMap.put("msg", "上传失败");
+                return resultMap;
+            }
+            String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
+            resultMap.put("success", true);
+            resultMap.put("msg", "上传成功");
+            resultMap.put("file_path", url);
+
+            response.addHeader("Access-Control-Allow-Headers","X-File-Name");
+            return resultMap;
+        }
+        resultMap.put("success", false);
+        resultMap.put("msg", "无权限操作");
+        return resultMap;
     }
 }

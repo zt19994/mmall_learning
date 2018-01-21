@@ -9,6 +9,7 @@ public interface IProductService {
 
     /**
      * 保存或更新产品信息
+     *
      * @param product
      * @return
      */
@@ -16,6 +17,7 @@ public interface IProductService {
 
     /**
      * 设置产品上下架状态
+     *
      * @param productId
      * @param status
      * @return
@@ -24,6 +26,7 @@ public interface IProductService {
 
     /**
      * 管理获取商品详细信息
+     *
      * @param productId
      * @return
      */
@@ -31,6 +34,7 @@ public interface IProductService {
 
     /**
      * 查询后台产品列表信息
+     *
      * @param pageNum
      * @param pageSize
      * @return
@@ -39,6 +43,7 @@ public interface IProductService {
 
     /**
      * 后台产品搜索
+     *
      * @param productName
      * @param productId
      * @param pageNum
@@ -46,4 +51,12 @@ public interface IProductService {
      * @return
      */
     ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize);
+
+    /**
+     * 通过产品id查询产品详情
+     *
+     * @param productId
+     * @return
+     */
+    ServerResponse<ProductDetailVo> getProductDetail(Integer productId);
 }

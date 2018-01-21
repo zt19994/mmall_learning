@@ -3,6 +3,7 @@ package com.mmall.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.mmall.common.Const;
 import com.mmall.common.ResponseCode;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.CategoryMapper;
@@ -30,29 +31,29 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ServerResponse saveOrUpdateProduct(Product product) {
-        if (product != null){
+        if (product != null) {
             //判断子图是否为空
-            if (StringUtils.isNotBlank(product.getSubImages())){
+            if (StringUtils.isNotBlank(product.getSubImages())) {
                 //获取子图列表
                 String[] subImageArray = product.getSubImages().split(",");
                 //如果子图大于1张，则把第一张设为主图
-                if (subImageArray.length>0){
+                if (subImageArray.length > 0) {
                     product.setMainImage(subImageArray[0]);
                 }
             }
 
             //如果是更新，则一定会传入id
-            if (product.getId() != null){
+            if (product.getId() != null) {
                 //id不为空，更新产品信息
                 int rowCount = productMapper.updateByPrimaryKey(product);
-                if (rowCount>0){
+                if (rowCount > 0) {
                     return ServerResponse.createBySuccess("更新产品成功");
                 }
                 return ServerResponse.createBySuccess("更新产品失败");
-            }else {
+            } else {
                 //id为空，则增加产品
                 int rowCount = productMapper.insert(product);
-                if (rowCount>0){
+                if (rowCount > 0) {
                     return ServerResponse.createBySuccess("新增产品成功");
                 }
                 return ServerResponse.createBySuccess("新增产品失败");
@@ -65,14 +66,14 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ServerResponse<String> setSaleStatus(Integer productId, Integer status) {
         //若商品id或状态为空，则传入的参数是错误的，使用ILLEGAL_ARGUMENT返回
-        if (productId == null || status == null){
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        if (productId == null || status == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         Product product = new Product();
         product.setId(productId);
         product.setStatus(status);
         int rowCount = productMapper.updateByPrimaryKeySelective(product);
-        if (rowCount>0){
+        if (rowCount > 0) {
             return ServerResponse.createBySuccess("修改产品销售状态成功");
         }
         return ServerResponse.createByErrorMessage("修改产品销售状态失败");
@@ -80,11 +81,11 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ServerResponse<ProductDetailVo> manageProductDetail(Integer productId) {
-        if (productId == null){
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        if (productId == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         Product product = productMapper.selectByPrimaryKey(productId);
-        if (product == null){
+        if (product == null) {
             //查询不到商品，商品已经下架或删除
             return ServerResponse.createByErrorMessage("商品已经下架或删除");
         }
@@ -94,7 +95,7 @@ public class ProductServiceImpl implements IProductService {
 
 
     //封装productDetailVo对象
-    private ProductDetailVo assembleProductDetailVo(Product product){
+    private ProductDetailVo assembleProductDetailVo(Product product) {
         ProductDetailVo productDetailVo = new ProductDetailVo();
         productDetailVo.setId(product.getId());
         productDetailVo.setSubtitle(product.getSubtitle());
@@ -110,10 +111,10 @@ public class ProductServiceImpl implements IProductService {
         productDetailVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://img.happymmall.com/"));
 
         Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
-        if (category==null){
+        if (category == null) {
             //把父类categoryId设为0,默认为根节点
             productDetailVo.setParentCategoryId(0);
-        }else {
+        } else {
             productDetailVo.setParentCategoryId(category.getParentId());
         }
 
@@ -143,7 +144,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     //封装ProductListVo对象
-    private ProductListVo assembleProductListVo(Product product){
+    private ProductListVo assembleProductListVo(Product product) {
         ProductListVo productListVo = new ProductListVo();
         productListVo.setId(product.getId());
         productListVo.setCategoryId(product.getCategoryId());
@@ -161,7 +162,7 @@ public class ProductServiceImpl implements IProductService {
         //pageHelper的使用方法，三步
         //1.startPage,记录一个开始
         PageHelper.startPage(pageNum, pageSize);
-        if (StringUtils.isNotBlank(productName)){
+        if (StringUtils.isNotBlank(productName)) {
             productName = new StringBuilder().append("%").append(productName).append("%").toString();
         }
         //2.填充自己的sql查询逻辑
@@ -176,4 +177,24 @@ public class ProductServiceImpl implements IProductService {
         pageResult.setList(productListVoList);
         return ServerResponse.createBySuccess(pageResult);
     }
+
+    @Override
+    public ServerResponse<ProductDetailVo> getProductDetail(Integer productId) {
+        if (productId == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        Product product = productMapper.selectByPrimaryKey(productId);
+        if (product == null) {
+            //查询不到商品，商品已经下架或删除
+            return ServerResponse.createByErrorMessage("商品已经下架或删除");
+        }
+        //不是在线状态
+        if (product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
+            return ServerResponse.createByErrorMessage("商品已经下架或删除");
+        }
+        ProductDetailVo productDetailVo = assembleProductDetailVo(product);
+        return ServerResponse.createBySuccess(productDetailVo);
+    }
+
+
 }

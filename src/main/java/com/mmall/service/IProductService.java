@@ -62,11 +62,14 @@ public interface IProductService {
 
     /**
      * 通过关键字或分类id查询产品列表
+     *
      * @param keyword
      * @param categoryId
      * @param pageNum
      * @param pageSize
      * @return
      */
-    ServerResponse<PageInfo> getProductByKeywordCategoryId(String keyword, Integer categoryId, int pageNum, int pageSize,String orderBy);
+    ServerResponse<PageInfo> getProductByKeywordCategoryId(String keyword, Integer categoryId, int pageNum, int pageSize, String orderBy);
+
+
 }

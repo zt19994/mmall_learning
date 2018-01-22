@@ -29,13 +29,23 @@ public class ProductController {
         return productService.getProductDetail(productId);
     }
 
+
+    /**
+     * 用户端的产品搜索
+     * @param keyword
+     * @param categoryId
+     * @param pageNum
+     * @param pageSize
+     * @param orderBy
+     * @return
+     */
+    @RequestMapping("list.do")
+    @ResponseBody
     public ServerResponse<PageInfo> list(@RequestParam(value = "keyword", required = false) String keyword,
                                          @RequestParam(value = "categoryId", required = false) Integer categoryId,
                                          @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                          @RequestParam(value = "pageSize",defaultValue = "10") int pageSize,
                                          @RequestParam(value = "orderBy",defaultValue = "") String orderBy) {
-
-        productService.getProductByKeywordCategoryId(keyword, categoryId, pageNum, pageSize, orderBy);
-        return null;
+        return productService.getProductByKeywordCategoryId(keyword, categoryId, pageNum, pageSize, orderBy);
     }
 }

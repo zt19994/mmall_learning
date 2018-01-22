@@ -205,15 +205,15 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ServerResponse<PageInfo> getProductByKeywordCategoryId(String keyword, Integer categoryId, int pageNum, int pageSize, String orderBy) {
         //判断keyword和categoryId是否为空
-        if (StringUtils.isBlank(keyword) && categoryId==null){
+        if (StringUtils.isBlank(keyword) && categoryId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         List<Integer> categoryIdList = new ArrayList<Integer>();
 
-        if (categoryId!=null){
+        if (categoryId != null) {
             //获取category
             Category category = categoryMapper.selectByPrimaryKey(categoryId);
-            if (category==null && StringUtils.isBlank(keyword)){
+            if (category == null && StringUtils.isBlank(keyword)) {
                 //没有该分类和关键字，返回空字符集，不报错
                 //pageHelper的使用方法，三步
                 //1.startPage,记录一个开始
@@ -227,17 +227,29 @@ public class ProductServiceImpl implements IProductService {
             //递归获取分类id
             categoryIdList = categoryService.selectCategoryAndChildrenById(category.getId()).getData();
         }
-        if (StringUtils.isNotBlank(keyword)){
+        if (StringUtils.isNotBlank(keyword)) {
             keyword = new StringBuilder().append("%").append("%").append("%").toString();
         }
         PageHelper.startPage(pageNum, pageSize);
         //排序处理
-        if (StringUtils.isNotBlank(orderBy)){
-            if(Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)){
-
+        if (StringUtils.isNotBlank(orderBy)) {
+            if (Const.ProductListOrderBy.PRICE_ASC_DESC.contains(orderBy)) {
+                String[] orderByArray = orderBy.split("_");
+                PageHelper.orderBy(orderByArray[0] + "_" + orderByArray[1]);
             }
         }
-        return null;
+        //三元表达式
+        List<Product> productList = productMapper.selectByNameAndCategoryIds(StringUtils.isBlank(keyword) ? null : keyword,
+                categoryIdList.size() == 0 ? null : categoryIdList);
+        List<ProductListVo> productListVoList = Lists.newArrayList();
+        for (Product product : productList) {
+            ProductListVo productListVo = assembleProductListVo(product);
+            productListVoList.add(productListVo);
+        }
+
+        PageInfo pageInfo = new PageInfo(productList);
+        pageInfo.setList(productListVoList);
+        return ServerResponse.createBySuccess(pageInfo);
     }
 
 

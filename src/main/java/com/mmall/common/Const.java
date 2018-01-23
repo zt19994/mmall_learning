@@ -18,6 +18,12 @@ public class Const {
         Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_desc", "price_asc");
     }
 
+    //购物车
+    public interface Cart{
+        int CHECKED = 1; //购物车选中状态
+        int UN_CHECKED = 0; //购物车未选中状态
+    }
+
     //设置角色常量
     public interface Role{
         int ROLE_CUSTOMER = 0; //普通用户

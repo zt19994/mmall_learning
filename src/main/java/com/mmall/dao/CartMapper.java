@@ -33,5 +33,18 @@ public interface CartMapper {
      */
     List<Cart> selectCartByUserId(Integer userId);
 
+    /**
+     * 查询购物车，检查是否勾选
+     * @param userId
+     * @return
+     */
     int selectCartProductCheckedStatusByUserId(Integer userId);
+
+    /***
+     * 通过用户id和产品列表来删除产品
+     * @param userId
+     * @param productList
+     * @return
+     */
+    int deleteByUserIdProductIds(@Param("userId") Integer userId, @Param("productList") List<String> productList);
 }

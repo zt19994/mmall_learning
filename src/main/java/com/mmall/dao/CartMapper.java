@@ -20,6 +20,7 @@ public interface CartMapper {
 
     /**
      * 通过用户id和产品id查询购物车
+     *
      * @param userId
      * @param productId
      * @return
@@ -28,6 +29,7 @@ public interface CartMapper {
 
     /**
      * 通过用户id查询购物车列表
+     *
      * @param userId
      * @return
      */
@@ -35,6 +37,7 @@ public interface CartMapper {
 
     /**
      * 查询购物车，检查是否勾选
+     *
      * @param userId
      * @return
      */
@@ -47,4 +50,21 @@ public interface CartMapper {
      * @return
      */
     int deleteByUserIdProductIds(@Param("userId") Integer userId, @Param("productList") List<String> productList);
+
+    /**
+     * 更新产品是否被选择
+     *
+     * @param userId
+     * @param checked
+     * @return
+     */
+    int checkedOrUncheckedProduct(@Param("userId") Integer userId, @Param("checked") Integer checked, @Param("productId") Integer productId);
+
+    /**
+     * 通过用户id查询购物车中产品的总数
+     *
+     * @param userId
+     * @return
+     */
+    int selectCartProductCount(Integer userId);
 }

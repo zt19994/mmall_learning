@@ -30,6 +30,13 @@ public class OrderController {
     @Autowired
     private IOrderService orderService;
 
+    /**
+     * 支付
+     * @param session
+     * @param orderNo
+     * @param request
+     * @return
+     */
     @RequestMapping("pay.do")
     @ResponseBody
     public ServerResponse pay(HttpSession session, Long orderNo, HttpServletRequest request){
@@ -41,6 +48,11 @@ public class OrderController {
         return orderService.pay(orderNo, user.getId(), path);
     }
 
+    /**
+     * 支付宝回调处理
+     * @param request
+     * @return
+     */
     @RequestMapping("alipay_callback.do")
     @ResponseBody
     public Object alipayCallback(HttpServletRequest request){
@@ -74,6 +86,31 @@ public class OrderController {
         //todo 验证各种数据
 
         //业务逻辑
-        return null;
+        ServerResponse serverResponse = orderService.aliCallback(params);
+        if (serverResponse.isSuccess()){
+            return Const.AlipayCallback.RESPONSE_SUCCESS;
+        }
+        return Const.AlipayCallback.RESPONSE_FAILED;
+    }
+
+    /**
+     * 查询订单状态
+     * @param session
+     * @param orderNo
+     * @return
+     */
+    @RequestMapping("query_order_pay_status.do")
+    @ResponseBody
+    public ServerResponse<Boolean> queryOrderPayStatus(HttpSession session, Long orderNo){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录管理员账号");
+        }
+
+        ServerResponse serverResponse = orderService.queryOrderPayStatus(user.getId(), orderNo);
+        if (serverResponse.isSuccess()){
+            return ServerResponse.createBySuccess(true);
+        }
+        return ServerResponse.createBySuccess(false);
     }
 }

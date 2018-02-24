@@ -30,6 +30,20 @@ public class OrderController {
     @Autowired
     private IOrderService orderService;
 
+
+    @RequestMapping("create.do")
+    @ResponseBody
+    public ServerResponse create(HttpSession session, Integer shippingId){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录管理员账号");
+        }
+
+        return null;
+    }
+
+
+
     /**
      * 支付
      * @param session

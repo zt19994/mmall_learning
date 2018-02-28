@@ -29,4 +29,12 @@ public interface IOrderService {
      */
     ServerResponse queryOrderPayStatus(Integer userId, Long orderNo);
 
+    /**
+     * 创建订单
+     * @param userId
+     * @param shippingId
+     * @return
+     */
+    ServerResponse createOrder(Integer userId, Integer shippingId);
+
 }

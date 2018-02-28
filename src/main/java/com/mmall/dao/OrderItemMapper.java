@@ -1,8 +1,6 @@
 package com.mmall.dao;
 
-import com.mmall.pojo.Order;
 import com.mmall.pojo.OrderItem;
-import edu.princeton.cs.algs4.In;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -28,4 +26,9 @@ public interface OrderItemMapper {
      */
     List<OrderItem> getByOrderNoUserId(@Param("orderNo")Long orderNo, @Param("userId")Integer userId);
 
+    /**
+     * 批量插入
+     * @param orderItemList
+     */
+    void batchInsert(@Param("orderItemList") List<OrderItem> orderItemList);
 }

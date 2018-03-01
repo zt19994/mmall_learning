@@ -22,8 +22,10 @@ import com.mmall.util.DateTimeUtil;
 import com.mmall.util.FTPUtil;
 import com.mmall.util.PropertiesUtil;
 import com.mmall.vo.OrderItemVo;
+import com.mmall.vo.OrderProductVo;
 import com.mmall.vo.OrderVo;
 import com.mmall.vo.ShippingVo;
+import edu.princeton.cs.algs4.In;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -313,6 +315,80 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
+    /**
+     * 取消订单
+     * @param userId
+     * @param orderNo
+     * @return
+     */
+    @Override
+    public ServerResponse<String> cancel(Integer userId, Long orderNo){
+        Order order = orderMapper.selectByUserIdAndOrderNo(userId, orderNo);
+        if (order == null){
+            return ServerResponse.createByErrorMessage("该用户此订单不存在");
+        }
+        //判断状态是否为未付款状态
+        if (order.getStatus() != Const.OrderStatusEnum.NO_PAY.getCode()){
+            //已付款
+            return ServerResponse.createByErrorMessage("已付款，无法取消订单");
+        }
+        //更新订单
+        Order updateOrder = new Order();
+        updateOrder.setUserId(order.getId());
+        updateOrder.setStatus(Const.OrderStatusEnum.CANCELED.getCode());
+
+        int row = orderMapper.updateByPrimaryKeySelective(updateOrder);
+        if (row > 0){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+    }
+
+
+    /**
+     * 获取订单的商品信息
+     * @param userId
+     * @return
+     */
+    @Override
+    public ServerResponse getOrderCartProduct(Integer userId){
+        OrderProductVo orderProductVo = new OrderProductVo();
+        //从购物车中获取数据
+
+        //获取被选中的购物车中的商品列表
+        List<Cart> cartList = cartMapper.selectCheckedCartByUserId(userId);
+        //获取购物车订单明细
+        ServerResponse serverResponse = this.getCartOrderItem(userId, cartList);
+        if (!serverResponse.isSuccess()){
+            //不成功
+            return serverResponse;
+        }
+        //计算总价
+        List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
+
+        List<OrderItemVo> orderItemVoList = Lists.newArrayList();
+
+        //初始化总价
+        BigDecimal payment = new BigDecimal("0");
+        for (OrderItem orderItem : orderItemList) {
+            payment = BigDecimalUtil.add(payment.doubleValue(), orderItem.getTotalPrice().doubleValue());
+            orderItemVoList.add(assembleOrderItemVo(orderItem));
+        }
+        orderProductVo.setProductTotalPrice(payment);
+        orderProductVo.setOrderItemVoList(orderItemVoList);
+        orderProductVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
+
+        return ServerResponse.createBySuccess(orderProductVo);
+    }
+
+
+    /**
+     * 支付
+     * @param orderNo
+     * @param userId
+     * @param path
+     * @return
+     */
     @Override
     public ServerResponse pay(Long orderNo, Integer userId, String path) {
         HashMap<String, String> resultMap = Maps.newHashMap();

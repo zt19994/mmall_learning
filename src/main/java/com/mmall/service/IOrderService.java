@@ -1,7 +1,9 @@
 package com.mmall.service;
 
+import com.github.pagehelper.PageInfo;
 import com.mmall.common.ServerResponse;
 import com.mmall.vo.OrderVo;
+import edu.princeton.cs.algs4.In;
 
 import java.util.Map;
 
@@ -61,5 +63,12 @@ public interface IOrderService {
      * @return
      */
     ServerResponse<OrderVo> getOrderDetail(Integer userId, Long orderNo);
+
+    /**
+     * 获取订单列表
+     * @param userId
+     * @return
+     */
+    ServerResponse<PageInfo> getOrderList(Integer userId, Integer pageNum, Integer pageSize);
 
 }

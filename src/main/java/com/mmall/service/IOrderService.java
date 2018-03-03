@@ -1,6 +1,7 @@
 package com.mmall.service;
 
 import com.mmall.common.ServerResponse;
+import com.mmall.vo.OrderVo;
 
 import java.util.Map;
 
@@ -52,5 +53,13 @@ public interface IOrderService {
      * @return
      */
     ServerResponse getOrderCartProduct(Integer userId);
+
+    /**
+     * 获取订单详情
+     * @param userId
+     * @param orderNo
+     * @return
+     */
+    ServerResponse<OrderVo> getOrderDetail(Integer userId, Long orderNo);
 
 }

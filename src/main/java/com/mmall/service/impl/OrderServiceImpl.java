@@ -383,6 +383,27 @@ public class OrderServiceImpl implements IOrderService {
 
 
     /**
+     * 获取订单详情
+     * @param userId
+     * @param orderNo
+     * @return
+     */
+    @Override
+    public ServerResponse<OrderVo> getOrderDetail(Integer userId, Long orderNo){
+        Order order = orderMapper.selectByUserIdAndOrderNo(userId, orderNo);
+        if (order != null){
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNoUserId(orderNo, userId);
+            //组装OrderVo
+            OrderVo orderVo = assembleOrderVo(order, orderItemList);
+            return ServerResponse.createBySuccess(orderVo);
+        }
+        return ServerResponse.createByErrorMessage("用户没有该订单");
+    }
+
+
+
+
+    /**
      * 支付
      * @param orderNo
      * @param userId

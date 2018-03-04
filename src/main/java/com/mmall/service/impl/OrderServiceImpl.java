@@ -664,6 +664,13 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
+    /**
+     * 后台查询订单
+     * @param orderNo
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @Override
     public ServerResponse<PageInfo> manageSearch(Long orderNo, Integer pageNum, Integer pageSize){
         PageHelper.startPage(pageNum, pageSize);
@@ -679,5 +686,25 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createByErrorMessage("订单不存在");
     }
 
+
+    /**
+     * 发货
+     * @param orderNo
+     * @return
+     */
+    @Override
+    public ServerResponse<String> manageSendGoods(Long orderNo){
+        Order order = orderMapper.selectByOrderNo(orderNo);
+        if (order != null){
+            //查看订单是否已经付款
+            if (order.getStatus() == Const.OrderStatusEnum.PAID.getCode()){
+                order.setStatus(Const.OrderStatusEnum.SHIPPED.getCode());
+                order.setSendTime(new Date());
+                orderMapper.updateByPrimaryKeySelective(order);
+                return ServerResponse.createBySuccess("发货成功");
+            }
+        }
+        return ServerResponse.createByErrorMessage("订单不存在");
+    }
 
 }

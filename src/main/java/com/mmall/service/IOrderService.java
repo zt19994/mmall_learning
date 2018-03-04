@@ -99,4 +99,12 @@ public interface IOrderService {
      */
     ServerResponse<PageInfo> manageSearch(Long orderNo, Integer pageNum, Integer pageSize);
 
+
+    /**
+     * 发货
+     * @param orderNo
+     * @return
+     */
+    ServerResponse<String> manageSendGoods(Long orderNo);
+
 }

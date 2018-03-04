@@ -71,6 +71,8 @@ public interface IOrderService {
     ServerResponse<PageInfo> getOrderList(Integer userId, Integer pageNum, Integer pageSize);
 
 
+    //backend 后台接口
+
     /**
      * 后台订单列表
      * @param pageNum
@@ -80,13 +82,21 @@ public interface IOrderService {
     ServerResponse<PageInfo> manageList(Integer pageNum, Integer pageSize);
 
 
-    //backend 后台接口
-
     /**
      * 订单详情
      * @param orderNo
      * @return
      */
     ServerResponse<OrderVo> manageDetail(Long orderNo);
+
+
+    /**
+     * 后台查询订单
+     * @param orderNo
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    ServerResponse<PageInfo> manageSearch(Long orderNo, Integer pageNum, Integer pageSize);
 
 }

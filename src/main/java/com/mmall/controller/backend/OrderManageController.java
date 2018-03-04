@@ -75,4 +75,31 @@ public class OrderManageController {
             return ServerResponse.createByErrorMessage("无权限操作");
         }
     }
+
+
+    /**
+     * 后台查询订单
+     * @param session
+     * @param orderNo
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping("search.do")
+    @ResponseBody
+    public ServerResponse<PageInfo> orderSearch(HttpSession session, Long orderNo,
+                                               @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize){
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null){
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登录，请登录管理员账号");
+        }
+        //检查管理员权限
+        if (userService.checkAdminRole(user).isSuccess()){
+            // 产品业务逻辑
+            return orderService.manageSearch(orderNo, pageNum, pageSize);
+        } else {
+            return ServerResponse.createByErrorMessage("无权限操作");
+        }
+    }
 }

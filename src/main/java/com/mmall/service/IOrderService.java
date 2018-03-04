@@ -71,4 +71,13 @@ public interface IOrderService {
      */
     ServerResponse<PageInfo> getOrderList(Integer userId, Integer pageNum, Integer pageSize);
 
+
+    /**
+     * 后台订单列表
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    ServerResponse<PageInfo> manageList(Integer pageNum, Integer pageSize);
+
 }

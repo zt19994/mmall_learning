@@ -39,4 +39,10 @@ public interface OrderMapper {
      * @return
      */
     List<Order> selectByUserId(Integer userId);
+
+    /**
+     * 查询所有订单
+     * @return
+     */
+    List<Order> selectAllOrder();
 }

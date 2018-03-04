@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.File;
 import java.io.IOException;
@@ -433,7 +434,8 @@ public class OrderServiceImpl implements IOrderService {
             //订单明细
             List<OrderItem> orderItemList = Lists.newArrayList();
             if (userId == null){
-                //todo 用户为空，管理员身份,不用传用户id
+                //用户为空，管理员身份,不用传用户id
+                orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
             }else {
                 orderItemList = orderItemMapper.getByOrderNoUserId(order.getOrderNo(), userId);
             }
@@ -623,6 +625,26 @@ public class OrderServiceImpl implements IOrderService {
             return ServerResponse.createBySuccess();
         }
         return ServerResponse.createByError();
+    }
+
+
+    //backend 后端
+
+    /**
+     * 返回后台订单分页列表
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public ServerResponse<PageInfo> manageList(Integer pageNum, Integer pageSize){
+        PageHelper.startPage(pageNum, pageSize);
+        List<Order> orderList = orderMapper.selectAllOrder();
+        //组装orderVo
+        List<OrderVo> orderVoList = this.assembleOrderVoList(orderList, null);
+        PageInfo pageResult = new PageInfo(orderList);
+        pageResult.setList(orderVoList);
+        return ServerResponse.createBySuccess(pageResult);
     }
 
 
